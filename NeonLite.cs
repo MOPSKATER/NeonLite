@@ -92,7 +92,6 @@ namespace NeonLite
             ModObject.AddComponent<CoyoteAssistant>();
 
             //TODO Add self repair if a file corrupts
-            //TODO OBS like input display
             //TODO LevelRush helper
             //TODO Reimplement the HUD manager stuff
         }
@@ -106,6 +105,7 @@ namespace NeonLite
             HUDManager.Initialize();
             LevelTimer.Initialize();
             RestartCounter.Initialize();
+            InputDisplay.Initialize();
         }
 
         public override void OnUpdate()
