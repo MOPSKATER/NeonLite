@@ -48,11 +48,11 @@ namespace NeonLite.GameObjects
                 builder[1] = ' ';
             }
 
-            if (x <= 0)
+            if (x >= 0)
             {
                 builder[2] = ' ';
             }
-            if (x >= 0)
+            if (x <= 0)
             {
                 builder[3] = ' ';
             }
