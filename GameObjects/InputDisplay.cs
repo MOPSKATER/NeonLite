@@ -37,6 +37,7 @@ namespace NeonLite.GameObjects
             updown.outlineColor = Color.black;
             updown.outlineWidth = 0.3f;
             updown.alignment = TextAlignmentOptions.Center;
+            updown.text = "-";
 
             leftright = Instantiate(updown, transform);
             leftright.transform.localPosition += new Vector3(0.5f, 0, 0);
