@@ -10,7 +10,8 @@ namespace NeonLite.GameObjects
         private TextMeshPro _testText;
         internal static void Initialize()
         {
-            new GameObject("InputDisplay", typeof(InputDisplay));
+            if (NeonLite.s_Setting_InputDisplay.Value)
+                new GameObject("InputDisplay", typeof(InputDisplay));
         }
 
         private void Start()
