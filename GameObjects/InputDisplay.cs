@@ -1,78 +1,125 @@
-﻿using System.Text;
+﻿using HarmonyLib;
+using MelonLoader;
+using Steamworks;
+using System.Text;
 using TMPro;
 using UnityEngine;
 
 
 namespace NeonLite.GameObjects
 {
+    [HarmonyPatch]
     internal class InputDisplay : MonoBehaviour
     {
-        private TextMeshPro _testText;
+        private static InputDisplay _instance = null;
+        private TextMeshPro updown;
+        private TextMeshPro leftright;
+        private TextMeshPro jump;
+        private TextMeshPro fire;
+        private TextMeshPro discard;
+        private TextMeshPro swap;
+
+        private static Color currentColor;
         internal static void Initialize()
         {
+            _instance = null;
             if (NeonLite.s_Setting_InputDisplay.Value)
                 new GameObject("InputDisplay", typeof(InputDisplay));
         }
 
-        private void Start()
+        private void Awake()
         {
             transform.parent = RM.ui.cardHUDUI.transform;
             transform.localPosition = new Vector3(0, -2f, 0);
             transform.localRotation = Quaternion.identity;
-            _testText = Instantiate(RM.ui.cardHUDUI.textAmmo, transform);
-            _testText.fontSize = 80;
-            _testText.outlineColor = Color.black;
-            _testText.outlineWidth = 5;
+
+            updown = Instantiate(RM.ui.cardHUDUI.textAmmo, transform);
+            updown.outlineColor = Color.black;
+            updown.outlineWidth = 0.3f;
+            updown.alignment = TextAlignmentOptions.Center;
+
+            leftright = Instantiate(updown, transform);
+            leftright.transform.localPosition += new Vector3(0.5f, 0, 0);
+
+            jump = Instantiate(updown, transform);
+            jump.transform.localPosition += new Vector3(1.0f, 0, 0);
+
+            fire = Instantiate(updown, transform);
+            fire.transform.localPosition += new Vector3(1.5f, 0, 0);
+
+            discard = Instantiate(updown, transform);
+            discard.transform.localPosition += new Vector3(2.0f, 0, 0);
+
+            swap = Instantiate(updown, transform);
+            swap.transform.localPosition += new Vector3(2.5f, 0, 0);
+
+            _instance = this;
+            RefreshColor();
+        }
+
+        private void RefreshColor()
+        {
+            _instance.updown.color = currentColor;
+            _instance.leftright.color = currentColor;
+            _instance.jump.color = currentColor;
+            _instance.fire.color = currentColor;
+            _instance.discard.color = currentColor;
+            _instance.swap.color = currentColor;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(PlayerUICardHUD), "UpdateHUD")]
+        private static void PreUpdateHUD(PlayerUICardHUD __instance, ref PlayerCard card)
+        {
+            currentColor = card.data.cardColor.Alpha(1f);
+            if (_instance)
+                _instance.RefreshColor();
         }
 
         private void Update()
         {
-            _testText.color = RM.ui.cardHUDUI.abilityIcon[0].abilityIconRenderer.material.GetColor("_TintColor").Alpha(1f);
-            
-            StringBuilder builder = new("^v<>J12S");
             var input = Singleton<GameInput>.Instance;
             var x = input.GetAxis(GameInput.GameActions.MoveHorizontal);
             var y = input.GetAxis(GameInput.GameActions.MoveVertical);
-            var jump = input.GetButton(GameInput.GameActions.Jump);
-            var fire = input.GetButton(GameInput.GameActions.FireCard);
-            var discard = input.GetButton(GameInput.GameActions.FireCardAlt);
-            var swap = input.GetButton(GameInput.GameActions.SwapCard);
+            var jumpi = input.GetButton(GameInput.GameActions.Jump);
+            var firei = input.GetButton(GameInput.GameActions.FireCard);
+            var discardi = input.GetButton(GameInput.GameActions.FireCardAlt);
+            var swapi = input.GetButton(GameInput.GameActions.SwapCard);
 
             // bad ugly code ahead
-            if (y <= 0)
+            updown.text = "-";
+            updown.fontStyle = FontStyles.Normal;
+            if (y != 0)
             {
-                builder[0] = ' ';
-            }
-            if (y >= 0)
-            {
-                builder[1] = ' ';
+                updown.fontStyle = FontStyles.Bold;
+                updown.text = "<voffset=-0.55em>^";
+                if (y < 0)
+                    updown.text = "<voffset=-0.65em><rotate=\"180\">^</rotate>";
             }
 
-            if (x >= 0)
+            leftright.text = "-";
+            leftright.fontStyle = FontStyles.Normal;
+            if (x != 0)
             {
-                builder[2] = ' ';
+                leftright.fontStyle = FontStyles.Bold;
+
+                leftright.text = ">";
+                if (x < 0)
+                    leftright.text = "<";
             }
-            if (x <= 0)
-            {
-                builder[3] = ' ';
-            }
-            if (!jump)
-            {
-                builder[4] = ' ';
-            }
-            if (!fire)
-            {
-                builder[5] = ' ';
-            }
-            if (!discard)
-            {
-                builder[6] = ' ';
-            }
-            if (!swap)
-            {
-                builder[7] = ' ';
-            }
-            _testText.SetText(builder.ToString());
+
+            jump.text = "-";
+            if (jumpi)
+                jump.text = "J";
+            fire.text = "-";
+            if (firei)
+                fire.text = "1";
+            discard.text = "-";
+            if (discardi)
+                discard.text = "2";
+            swap.text = "-";
+            if (swapi)
+                swap.text = "S";
         }
 
     }
