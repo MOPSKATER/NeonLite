@@ -37,7 +37,6 @@ namespace NeonLite.GameObjects
             updown.outlineColor = Color.black;
             updown.outlineWidth = 0.3f;
             updown.alignment = TextAlignmentOptions.Center;
-            updown.text = "-";
 
             leftright = Instantiate(updown, transform);
             leftright.transform.localPosition += new Vector3(0.5f, 0, 0);
@@ -56,6 +55,7 @@ namespace NeonLite.GameObjects
 
             _instance = this;
             RefreshColor();
+            Update();
         }
 
         private void RefreshColor()
@@ -72,7 +72,10 @@ namespace NeonLite.GameObjects
         [HarmonyPatch(typeof(PlayerUICardHUD), "UpdateHUD")]
         private static void PreUpdateHUD(PlayerUICardHUD __instance, ref PlayerCard card)
         {
-            currentColor = card.data.cardColor.Alpha(1f);
+            if (NeonLite.s_Setting_InputDisplayColor.Value.a != 0)
+                currentColor = NeonLite.s_Setting_InputDisplayColor.Value.Alpha(1f);
+            else            
+                currentColor = card.data.cardColor.Alpha(1f);
             if (_instance)
                 _instance.RefreshColor();
         }

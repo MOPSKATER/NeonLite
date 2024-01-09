@@ -33,6 +33,7 @@ namespace NeonLite
         public static MelonPreferences_Entry<bool> s_Setting_RestartsSession;
         public static MelonPreferences_Entry<float> s_Setting_CoyoteAssistant;
         public static MelonPreferences_Entry<bool> s_Setting_InputDisplay;
+        public static MelonPreferences_Entry<Color> s_Setting_InputDisplayColor;
 
         public static MelonPreferences_Category Config_NeonLiteVisuals { get; private set; }
         public static MelonPreferences_Entry<bool> s_Setting_PlayerPortrait;
@@ -59,6 +60,7 @@ namespace NeonLite
             s_Setting_RestartsSession = Config_NeonLite.CreateEntry("Show session restarts", true, description: "Shows the amout of restarts for a level during the current session.");
             s_Setting_CoyoteAssistant = Config_NeonLite.CreateEntry("Coyote Assistant", 0.05f, description: "The bigger the value, the earlier Neon Lite tells you to jump. -1 means disabled.\n(You must copy paste values > 0.1)");
             s_Setting_InputDisplay = Config_NeonLite.CreateEntry("Input Display", true, description: "Displays inputs under your ammo.\n(Text-based for now)");
+            s_Setting_InputDisplayColor = Config_NeonLite.CreateEntry("Input Display Color", Color.clear, description: "The color to make the input display.\nSet alpha to 0 to have it match the current card.");
 
             Config_NeonLiteVisuals = MelonPreferences.CreateCategory("NeonLite Visual Settings");
             s_Setting_PlayerPortrait = Config_NeonLiteVisuals.CreateEntry("Disable the Player portrait", false);
