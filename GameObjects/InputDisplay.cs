@@ -96,9 +96,9 @@ namespace NeonLite.GameObjects
             if (y != 0)
             {
                 updown.fontStyle = FontStyles.Bold;
-                updown.text = "<voffset=-0.55em>^";
+                updown.text = "<rotate=\"90\">></rotate>"; // it's hard to see but it's rotate >
                 if (y < 0)
-                    updown.text = "<voffset=-0.65em><rotate=\"180\">^</rotate>";
+                    updown.text = "<rotate=\"90\"><</rotate>"; // rotate <
             }
 
             leftright.text = "-";
