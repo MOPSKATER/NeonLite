@@ -49,22 +49,25 @@ namespace NeonLite.GameObjects
         
         public static void Setup()
         {
-            // setup the textures
+            if (NeonLite.s_Setting_InputDisplay.Value)
+            {
+                // setup the textures
 
-            _upTex = LoadTexture(Properties.Resources.InputUp);
-            _downTex = LoadTexture(Properties.Resources.InputDown);
-            _leftTex = LoadTexture(Properties.Resources.InputLeft);
-            _rightTex = LoadTexture(Properties.Resources.InputRight);
+                _upTex = LoadTexture(Properties.Resources.InputUp);
+                _downTex = LoadTexture(Properties.Resources.InputDown);
+                _leftTex = LoadTexture(Properties.Resources.InputLeft);
+                _rightTex = LoadTexture(Properties.Resources.InputRight);
 
-            _fireTex = LoadTexture(Properties.Resources.InputFire);
-            _discardTex = LoadTexture(Properties.Resources.InputDiscard);
-            _jumpTex = LoadTexture(Properties.Resources.InputJump);
-            _swapTex = LoadTexture(Properties.Resources.InputSwap);
+                _fireTex = LoadTexture(Properties.Resources.InputFire);
+                _discardTex = LoadTexture(Properties.Resources.InputDiscard);
+                _jumpTex = LoadTexture(Properties.Resources.InputJump);
+                _swapTex = LoadTexture(Properties.Resources.InputSwap);
 
-            _scrollTex = LoadTexture(Properties.Resources.InputScroll);
+                _scrollTex = LoadTexture(Properties.Resources.InputScroll);
 
-            _fake2 = LoadTexture(Properties.Resources.InputFake2);
-            _fake3 = LoadTexture(Properties.Resources.InputFake3);
+                _fake2 = LoadTexture(Properties.Resources.InputFake2);
+                _fake3 = LoadTexture(Properties.Resources.InputFake3);
+            }
         }
 
         internal static void Initialize()
@@ -156,6 +159,11 @@ namespace NeonLite.GameObjects
 
             Destroy(abase);
 
+            // BONUS: the 3rd ability icon is slightly off and is at a weird spot
+            // let's move it and make it look even nicer
+            cardUI.abilityIconHolder.transform.GetChild(2).localPosition = new Vector3((float)off * 2, 0, 0);
+
+
             _instance = this;
             RefreshColor();
             Update();
@@ -182,8 +190,13 @@ namespace NeonLite.GameObjects
         {
             if (NeonLite.s_Setting_InputDisplayColor.Value.a != 0)
                 currentColor = NeonLite.s_Setting_InputDisplayColor.Value.Alpha(1f);
-            else            
-                currentColor = card.data.cardColor.Alpha(1f);
+            else
+            {
+                if (card.data.discardAbility == PlayerCardData.DiscardAbility.None) // katana/fist
+                    currentColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+                else 
+                    currentColor = card.data.cardColor.Alpha(1f);
+            }
             if (_instance)
                 _instance.RefreshColor();
         }
@@ -194,7 +207,6 @@ namespace NeonLite.GameObjects
             var input = Singleton<GameInput>.Instance;
             var x = input.GetAxis(GameInput.GameActions.MoveHorizontal);
             var y = input.GetAxis(GameInput.GameActions.MoveVertical);
-            
             var jumpd = input.GetButtonDown(GameInput.GameActions.Jump, GameInput.InputType.Game);
             if (jumpd)
             {
