@@ -172,6 +172,8 @@ namespace NeonLite.GameObjects
             discard?.material.SetColor("_TintColor", currentColor);
             jump?.material.SetColor("_TintColor", currentColor);
             swap?.material.SetColor("_TintColor", currentColor);
+
+            scroll?.material.SetColor("_TintColor", currentColor);
         }
 
         [HarmonyPrefix]
