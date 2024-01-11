@@ -139,6 +139,39 @@
   <data name="DiscordDLL" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DiscordDLL;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="InputDiscard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Discard.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Down.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputFake2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Fake1.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputFake3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Fake2.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputFire" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Fire.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputJump" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Jump.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputLeft" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Left.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputRight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Right.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputScroll" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\ScrollJump.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputSwap" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Swap.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InputUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InputDisplay\Up.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="MedalAmethyst" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MedalAmethyst.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

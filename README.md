@@ -58,6 +58,8 @@ Still currently a work in progress and thus it only features a limited amount of
 * [Verrix](https://discord.gg/SFnWweK8r9), help with community medal sprites.
 * [The Gang](https://github.com/steelLMG), updating the medal times
 * [Marbles](https://github.com/MarblesFr), custom portrait feature and updating the mikey stamp for medals
+* Glint, the author of the original OBS input display
+* [stxtic](https://github.com/stxticOVFL), in-game input display
 
 ### Additional Notes
 
