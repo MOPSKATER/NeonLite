@@ -2,6 +2,7 @@
 using MelonLoader;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NeonLite.Modules
 {
@@ -10,14 +11,17 @@ namespace NeonLite.Modules
     {
 
         private static MenuButtonHolder ghostButton;
+
         private static bool jobArchive;
+        private static MenuButtonHolder backGhost;
+
         private static MelonPreferences_Entry<bool> _setting_GhostButton;
 
         public OpenGhostDir() =>
             _setting_GhostButton = NeonLite.Config_NeonLite.CreateEntry("Open Ghost Directory Button", true, description: "Shows a button at the end to open this level's ghost directory in the file explorer.");
 
 
-        public static string GetGhostDirectory(LevelData level = null)
+        private static string GetGhostDirectory(LevelData level)
         {
             if (level == null)
                 level = Singleton<Game>.Instance.GetCurrentLevel();
@@ -26,112 +30,115 @@ namespace NeonLite.Modules
             return path;
         }
 
-        private static void SetupButton(MenuButtonHolder button, LevelData level = null)
+        private static void SetupButton(MenuButtonHolder button, Transform parent = null, LevelData level = null)
         {
-            try
+            if (ghostButton == null || jobArchive)
             {
-                if (ghostButton != null)
-                {
-                    if (jobArchive)
-                    {
-                        UnityEngine.Object.Destroy(ghostButton.gameObject);
-                        UnityEngine.Object.Destroy(ghostButton.transform.parent.gameObject);
-                        ghostButton = null;
-                    }
-                }
-
-                if (ghostButton == null)
-                {
-                    // copy the layout
+                if (parent == null)
+                {// copy the layout
                     var layout = UnityEngine.Object.Instantiate(button.transform.parent.gameObject, button.transform.parent.parent);
                     layout.name = "Ghost Button Holder";
                     // empty it
                     foreach (Transform child in layout.transform)
                         UnityEngine.Object.Destroy(child.gameObject);
-
-                    var ghostObject = UnityEngine.Object.Instantiate(button.gameObject, layout.transform);
-                    ghostButton = ghostObject.GetComponent<MenuButtonHolder>();
-                    var backComponent = ghostObject.GetComponent<BackButtonAccessor>();
-                    if (backComponent)
-                        UnityEngine.Object.Destroy(backComponent);
-
-                    ghostButton.ButtonRef.onClick.RemoveAllListeners();
-                    ghostButton.ButtonRef.onClick.AddListener(() => Process.Start("file://" + GetGhostDirectory(level)));
+                    parent = layout.transform;
                 }
 
-                ghostButton.name = "Button Ghost";
-                ghostButton.buttonText = "Open Ghost Directory";
-                ghostButton.buttonTextRef.text = "Open Ghost Directory";
-                ghostButton.gameObject.SetActive(_setting_GhostButton.Value);
+                var ghostObject = UnityEngine.Object.Instantiate(button.gameObject, parent);
+                ghostButton = ghostObject.GetComponent<MenuButtonHolder>();
+                var backComponent = ghostObject.GetComponent<BackButtonAccessor>();
+                if (backComponent)
+                    UnityEngine.Object.Destroy(backComponent);
+
+                ghostButton.ButtonRef.onClick.RemoveAllListeners();
+                ghostButton.ButtonRef.onClick.AddListener(() => Process.Start("file://" + GetGhostDirectory(level)));
             }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError("error on setting up the button " + e);
-            }
+
+            ghostButton.name = "Button Ghost";
+            ghostButton.buttonText = "Open Ghost Directory";
+            ghostButton.buttonTextRef.text = "Open Ghost Directory";
+            ghostButton.gameObject.SetActive(_setting_GhostButton.Value);
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MenuScreenResults), "OnSetVisible")]
         private static void OnMenuScreen(ref MenuScreenResults __instance)
         {
-            try
-            {
-                if (ghostButton && __instance.buttonsToLoad.Contains(ghostButton))
-                    __instance.buttonsToLoad.Remove(ghostButton);
-                var button = __instance._buttonContine;
-                SetupButton(button);
+            if (!_setting_GhostButton.Value)
+                return;
 
-                var pos = button.transform.parent.position;
-                pos.x = -0.35f; // don't ask me how. the math just ISN'T THERE i had to hardcode it
-                ghostButton.transform.parent.position = pos;
+            var button = __instance._buttonContine;
+            SetupButton(button);
 
-                if (!__instance.buttonsToLoad.Contains(ghostButton))
-                    __instance.buttonsToLoad.Add(ghostButton);
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError("error on OnMenuScreen " + e);
-            }
+            var pos = button.transform.parent.position;
+            pos.x = -0.35f; // don't ask me how. the math just ISN'T THERE i had to hardcode it
+            ghostButton.transform.parent.position = pos;
+
+            if (!__instance.buttonsToLoad.Contains(ghostButton))
+                __instance.buttonsToLoad.Add(ghostButton);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MainMenu), "SetState")]
-        public static void SetState(ref MainMenu __instance)
+        private static void SetState(ref MainMenu __instance)
         {
-            if (ghostButton != null)
+            if (jobArchive)
             {
-                if (jobArchive)
-                {
-                    UnityEngine.Object.Destroy(ghostButton.gameObject);
-                    UnityEngine.Object.Destroy(ghostButton.transform.parent.gameObject);
-                    jobArchive = false;
-                }
-                else if (__instance._screenResults.buttonsToLoad.Contains(ghostButton))
-                {
-                    __instance._screenResults.buttonsToLoad.Remove(ghostButton);
-                }
-                ghostButton = null;
+                backGhost.gameObject.SetActive(false);
+                jobArchive = false;
             }
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MainMenu), "SelectMission")]
-        public static void SelectMission(ref MainMenu __instance, ref string missionID, ref bool goToLevelScreen)
+        public static void SelectMissionScreen(ref MainMenu __instance, ref string missionID, ref bool goToLevelScreen)
         {
-            if (!goToLevelScreen)
+            if (!goToLevelScreen || !_setting_GhostButton.Value)
                 return;
-            jobArchive = true;
-            var button = __instance._backButton;
-            SetupButton(button.GetComponent<MenuButtonHolder>(), Singleton<Game>.Instance.GetGameData().GetMission(missionID).levels[0]);
 
-            var pos = button.transform.parent.position;
-            pos.x = 7.02f; // same thing here it's stupid
-            ghostButton.transform.parent.position = pos;
+            var button = __instance._backButton;
+            jobArchive = true;
+            if (!button.transform.parent.GetComponent<VerticalLayoutGroup>())
+            {
+                var layoutGroup = button.transform.parent.GetOrAddComponent<VerticalLayoutGroup>(); // setup a vertical layout
+                UnityEngine.Object.Destroy(layoutGroup.transform.GetChild(1).gameObject); // remove the random gameobject, possibly just won't work well
+                layoutGroup.childForceExpandWidth = false;
+                layoutGroup.childControlHeight = false;
+                layoutGroup.reverseArrangement = true;
+                layoutGroup.childAlignment = TextAnchor.LowerLeft;
+                layoutGroup.spacing = -20; // what i found looked best and most accurate
+                layoutGroup.transform.position = button.transform.position; // move the position to be at the button pos
+                var layoutFitter = layoutGroup.GetOrAddComponent<ContentSizeFitter>(); // add a content fitter to keep the width/height under control
+                layoutFitter.horizontalFit = ContentSizeFitter.FitMode.MinSize;
+                layoutFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                var layoutRect = layoutGroup.GetComponent<RectTransform>();
+                // run math to set the pivot without changing position
+                // courtesy of https://discussions.unity.com/t/139741/4
+                Vector2 newPivot = new(0.5f, 0);
+                Vector3 deltaPosition = layoutRect.pivot - newPivot;                 // get change in pivot
+                deltaPosition.Scale(button.GetComponent<RectTransform>().rect.size); // apply sizing, from the size of the *button*
+                deltaPosition.Scale(layoutRect.localScale);                          // apply scaling
+                layoutRect.pivot = newPivot;                                         // change the pivot
+                layoutRect.localPosition -= deltaPosition;                           // reverse the position
+            }
+
+            var ghostTransform = button.transform.parent.Find("Button Ghost"); //reload the reference just 2 b safe
+            if (backGhost == null)
+            {
+                var gbTemp = ghostButton;
+                SetupButton(button.GetComponent<MenuButtonHolder>(), button.transform.parent);
+                backGhost = ghostButton;
+                ghostButton = gbTemp;
+            }
+            else
+                backGhost = ghostTransform.GetComponent<MenuButtonHolder>();
+            backGhost.gameObject.SetActive(true);
+            SetMissionLevel(Singleton<Game>.Instance.GetGameData().GetMission(missionID).levels[0]);
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Singleton<BackButtonAccessor>), "OnDestroy")]
-        public static bool OnDestroy()
+        public static bool OnBackDestroy()
         {
             // the back button's singleton is EXTREMELY fragile
             // so we just tell it to not worry
@@ -143,13 +150,13 @@ namespace NeonLite.Modules
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MenuPanelInventoryItem), "SetLevel")]
-        public static void SetLevel(LevelData level)
+        public static void SetMissionLevel(LevelData level)
         {
-            if (!ghostButton)
+            if (!backGhost)
                 return;
 
-            ghostButton.ButtonRef.onClick.RemoveAllListeners();
-            ghostButton.ButtonRef.onClick.AddListener(() => Process.Start("file://" + GetGhostDirectory(level)));
+            backGhost.ButtonRef.onClick.RemoveAllListeners();
+            backGhost.ButtonRef.onClick.AddListener(() => Process.Start("file://" + GetGhostDirectory(level)));
         }
     }
 }
